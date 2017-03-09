@@ -553,6 +553,7 @@ static int tps6518x_pmic_dt_parse_pdata(struct platform_device *pdev,
 		}
 
 		rdata->id = i;
+		//controlar parametros funcion of_get_regulator_init_data() modificados
 		rdata->initdata = of_get_regulator_init_data(&pdev->dev,pmic_np, tps6518x_reg);//ori->(&pdev->dev,reg_np, tps6518x_reg);
 													//(reg_np,pmic_np,tps6518x_reg )
 		/*includeed in /linux/regulator/of_regulator.h
