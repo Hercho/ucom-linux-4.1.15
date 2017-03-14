@@ -156,10 +156,19 @@
 	};
 };
 
+&epdc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_epdc0 &pinctrl_enet2_epdc0_en>;
+	V3P3-supply = <&V3P3_reg>;
+	VCOM-supply = <&VCOM_reg>;
+	DISPLAY-supply = <&DISPLAY_reg>;
+	en-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+	status = "okay"; //"disabled";
+};
+
 &epxp {
 	status = "okay";
 };
-
 
 &fec1 {
 	pinctrl-names = "default";
@@ -507,7 +516,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
 	status = "okay";
-/*
+
 	tps6518x: tps6518x@68 {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_tps6518x>;
@@ -517,25 +526,25 @@
 		/*
 		* power sequencing for TPS65180/65181
 		*/		 
-/*		pwr_seq0 = <0xe1>; /* [Vddh-seq=3 | Vpos-seq=2 | Vee-seq=0 | Vneg-seq=1] */
+		pwr_seq0 = <0xe1>; /* [Vddh-seq=3 | Vpos-seq=2 | Vee-seq=0 | Vneg-seq=1] */
 		pwr_seq1 = <0x30>; /* [Vneg-dly1=3 |Vee-dly0=0]  mSec */
 		pwr_seq2 = <0x33>; /* [Vddh-dly3=3 | Vpos-dly2=3] mSec */
 		/*
 		 * power sequencing for TPS65185/65186
 		 */
-/*		upseq0 = <0xe4>;
+		upseq0 = <0xe4>;
 		upseq1 = <0x55>;
 		dwnseq0 = <0x1e>;
 		dwnseq1 = <0xe0>;
 
 				
-
+/*
 		gpio_pmic_pwrgood = <&gpio2 31 0>;
 		gpio_pmic_vcom_ctrl = <&gpio4 14 0>;
 		gpio_pmic_wakeup = <&gpio2 23 0>;
 		gpio_pmic_v3p3 = <&gpio2 30 0>;
 		gpio_pmic_intr = <&gpio2 22 0>;
-
+*/
 		regulators {
 			DISPLAY_reg: DISPLAY {
 				regulator-name = "DISPLAY";
@@ -545,9 +554,9 @@
 			VCOM_reg: VCOM {
 				regulator-name = "VCOM";
 				/* 2's-compliment, -4325000 */
-/*				regulator-min-microvolt = <0xffbe0178>;
+				regulator-min-microvolt = <0xffbe0178>;
 				/* 2's-compliment, -500000 */
-/*				regulator-max-microvolt = <0xfff85ee0>;
+				regulator-max-microvolt = <0xfff85ee0>;
 			};
 
 			V3P3_reg: V3P3 {
@@ -555,7 +564,7 @@
 			};
 		};
 	};
-*/
+
 };
 
 &i2c4 {
@@ -591,15 +600,15 @@
 //			>;
 //		};
 
-//		pinctrl_tps6518x: tps6518xgrp-1 {
-//			fsl,pins = <
+		pinctrl_tps6518x: tps6518xgrp-1 {
+			fsl,pins = <
 //				MX7D_PAD_ENET1_RX_CLK__EPDC_PWR_WAKE   0x80000000 //MX7D_PAD_EPDC_SDCE3__GPIO2_IO23		0x80000000  /* wakeup */
 //				MX7D_PAD_ENET1_RGMII_RD0__EPDC_VCOM0   0x80000000 // MX7D_PAD_I2C4_SCL__GPIO4_IO14		0x80000000  /* vcom_ctrl */
-//				MX7D_PAD_ENET1_TX_CLK__EPDC_PWR_IRQ 0x80000000 // MX7D_PAD_EPDC_SDCE2__GPIO2_IO22		0x80000000  /* pwr int */
-//				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31	0x80000000  ///* pwrgood */ Ok Idem
-//				MX7D_PAD_ENET1_CRS__EPDC_PWR_CTRL0	0x80000000 //MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x80000000  /* v3p3 */
-//			>;
-//		};
+//				MX7D_PAD_ENET1_TX_CLK__EPDC_PWR_IRQ 	0x80000000 // MX7D_PAD_EPDC_SDCE2__GPIO2_IO22		0x80000000  /* pwr int */
+//				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31		0x80000000  ///* pwrgood */ Ok Idem
+//				MX7D_PAD_ENET1_CRS__EPDC_PWR_CTRL0		0x80000000 //MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x80000000  /* v3p3 */
+			>;
+		};
 
 		pinctrl_rgb_connector: rgb_connector_grp {
 			fsl,pins = <
@@ -965,12 +974,17 @@
 			>;
 		};
 
-                pinctrl_pwm3: pwm3grp {
+		pinctrl_pwm3: pwm3grp {
                         fsl,pins = <
                                 MX7D_PAD_GPIO1_IO03__PWM3_OUT   0x110b0
                         >;
                 };
 
+		pinctrl_enet2_epdc0_en: enet2_epdc0_grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO04__GPIO1_IO4		0x59
+			>;
+		};
 	};
 };
 
