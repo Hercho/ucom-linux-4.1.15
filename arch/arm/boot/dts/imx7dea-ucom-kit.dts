@@ -34,7 +34,7 @@
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <6>;
 		enable-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;
-		status = "okay";
+		status = "disabled";//status = "okay";
 	};
 
 	pxp_v4l2_out {
@@ -133,7 +133,7 @@
 
 &adc2 {
 	vref-supply = <&reg_vref_1v8>;
-	status = "okay";
+	status = "disabled";//status = "okay";
 };
 
 &clks {
@@ -200,7 +200,7 @@
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	xceiver-supply = <&reg_can2_3v3>;
 	trx-stby-gpio = <&gpio2 23 GPIO_ACTIVE_LOW>;
-	status = "okay";
+	status = "disabled";//status = "okay";
 };
 
 &flexcan2 {
@@ -208,7 +208,7 @@
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	xceiver-supply = <&reg_can2_3v3>;
 	trx-stby-gpio = <&gpio2 23 GPIO_ACTIVE_LOW>;
-	status = "okay";
+	status = "disabled";//status = "okay";
 };
 
 &mipi_csi {
@@ -442,6 +442,7 @@
                 ar1021,swap_xy;
                 ar1021,invert_x;
                 #ar1021,invert_y;
+				status = "disabled"; //add
         };
 
         /* eGalax touch controller through RGB display interface connector on Carrier Board */
@@ -488,6 +489,7 @@
                 pinctrl-0 = <&pinctrl_rgb_connector>;
                 interrupt-parent = <&gpio5>;
                 interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+				status = "disabled"; //add
         };
 };
 
@@ -501,10 +503,10 @@
 	elan@15 {
 		compatible = "elan,elan-ktf2k";
 		reg = <0x15>;
-//		interrupt-parent = <&gpio2>;
+//		interrupt-parent = <&gpio2>;  // 
 //		interrupts = <10 2>;
-//		gpio_elan_cs = <&gpio2 9 0>;  //GPIO1_IO02 -> CE
-//		gpio_elan_rst = <&gpio4 4 0>; //GPIO1_IO03 -> RESET
+//		gpio_elan_cs = <&gpio2 9 0>;  //GPIO1_IO02 -> CE   <&gpio1 2 0>;
+//		gpio_elan_rst = <&gpio4 4 0>; //GPIO1_IO03 -> RESET <&gpio1 3 0>; 
 //		gpio_intr = <&gpio2 10 0>;	  //ENET1_TD1  -> INTERRUP
 		status = "disabled"; //"okay"; //ENABLE_TOUCH -> GPIO1_IO04
 	};
@@ -603,7 +605,7 @@
 		pinctrl_tps6518x: tps6518xgrp-1 {
 			fsl,pins = <
 //				MX7D_PAD_ENET1_RX_CLK__EPDC_PWR_WAKE   0x80000000 //MX7D_PAD_EPDC_SDCE3__GPIO2_IO23		0x80000000  /* wakeup */
-//				MX7D_PAD_ENET1_RGMII_RD0__EPDC_VCOM0   0x80000000 // MX7D_PAD_I2C4_SCL__GPIO4_IO14		0x80000000  /* vcom_ctrl */
+//				MX7D_PAD_ENET1_RGMII_RD0__EPDC_VCOM0   0x80000000 // MX7D_PAD_I2C4_SCL__GPIO4_IO14		0x80000000  /* vcom_ctrl */ MX7D_PAD_ENET1_RGMII_RD0__GPIO7_IO0
 //				MX7D_PAD_ENET1_TX_CLK__EPDC_PWR_IRQ 	0x80000000 // MX7D_PAD_EPDC_SDCE2__GPIO2_IO22		0x80000000  /* pwr int */
 //				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31		0x80000000  ///* pwrgood */ Ok Idem
 //				MX7D_PAD_ENET1_CRS__EPDC_PWR_CTRL0		0x80000000 //MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x80000000  /* v3p3 */
@@ -994,7 +996,7 @@
 		     &pinctrl_lcdif_ctrl>;
 	pinctrl-assert-gpios = <&gpio2 25 GPIO_ACTIVE_HIGH>;
 	display = <&display0>;
-	status = "okay";
+	status = "disabled";//"okay";
 
 	display0: display {
 		bits-per-pixel = <24>;
