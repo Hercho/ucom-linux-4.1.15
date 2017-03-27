@@ -538,7 +538,6 @@
 		upseq1 = <0x55>;
 		dwnseq0 = <0x1e>;
 		dwnseq1 = <0xe0>;
-
 				
 /*
 		gpio_pmic_pwrgood = <&gpio2 31 0>;
