@@ -500,15 +500,15 @@
 	status = "okay";
 
 	/* elan-touch ektf2232 */ //Falta habilitar pines de control en iomux... 
-	elan@15 {
-		compatible = "elan,elan-ktf2k";
-		reg = <0x15>;
-//		interrupt-parent = <&gpio2>;  // 
-//		interrupts = <10 2>;
-//		gpio_elan_cs = <&gpio2 9 0>;  //GPIO1_IO02 -> CE   <&gpio1 2 0>;
-//		gpio_elan_rst = <&gpio4 4 0>; //GPIO1_IO03 -> RESET <&gpio1 3 0>; 
-//		gpio_intr = <&gpio2 10 0>;	  //ENET1_TD1  -> INTERRUP
-		status = "disabled"; //"okay"; //ENABLE_TOUCH -> GPIO1_IO04
+	elan@10 {  //15
+		compatible = "elan,elan-touch";//compatible = "elan,elan-ktf2k";
+		reg = <0x10>; //reg = <0x15>;
+		interrupt-parent = <&gpio1>;  // 2 
+		interrupts = <7 7>;//<10 2>;
+		gpio_elan_cs = <&gpio1 2 0>;	//<&gpio2 9 0>;  //GPIO1_IO02 -> CE   <&gpio1 2 0>;
+		gpio_elan_rst = <&gpio1 3 0>; 	//<&gpio4 4 0>; //GPIO1_IO03 -> RESET <&gpio1 3 0>; 
+		gpio_intr = <&gpio7 7 0>;	  //ENET1_TD1  -> (INTERRUP MX7D_PAD_ENET1_RGMII_TD1__GPIO7_IO7)
+		status = "okay"; //ENABLE_TOUCH -> GPIO1_IO04
 	};
 
 };
@@ -539,13 +539,13 @@
 		dwnseq0 = <0x1e>;
 		dwnseq1 = <0xe0>;
 				
-/*
-		gpio_pmic_pwrgood = <&gpio2 31 0>;
-		gpio_pmic_vcom_ctrl = <&gpio4 14 0>;
-		gpio_pmic_wakeup = <&gpio2 23 0>;
-		gpio_pmic_v3p3 = <&gpio2 30 0>;
-		gpio_pmic_intr = <&gpio2 22 0>;
-*/
+
+		gpio_pmic_pwrgood = <&gpio2 31 0>;	//<&gpio2 31 0>;
+		gpio_pmic_vcom_ctrl = <&gpio7 0 0>; //<&gpio4 14 0>;
+		gpio_pmic_wakeup = <&gpio7 13 0>; //<&gpio2 23 0>;
+		gpio_pmic_v3p3 = <&gpio7 14 0>;
+		gpio_pmic_intr = <&gpio7 12 0>;
+
 		regulators {
 			DISPLAY_reg: DISPLAY {
 				regulator-name = "DISPLAY";
@@ -603,11 +603,11 @@
 
 		pinctrl_tps6518x: tps6518xgrp-1 {
 			fsl,pins = <
-//				MX7D_PAD_ENET1_RX_CLK__EPDC_PWR_WAKE   0x80000000 //MX7D_PAD_EPDC_SDCE3__GPIO2_IO23		0x80000000  /* wakeup */
-//				MX7D_PAD_ENET1_RGMII_RD0__EPDC_VCOM0   0x80000000 // MX7D_PAD_I2C4_SCL__GPIO4_IO14		0x80000000  /* vcom_ctrl */ MX7D_PAD_ENET1_RGMII_RD0__GPIO7_IO0
-//				MX7D_PAD_ENET1_TX_CLK__EPDC_PWR_IRQ 	0x80000000 // MX7D_PAD_EPDC_SDCE2__GPIO2_IO22		0x80000000  /* pwr int */
-//				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31		0x80000000  ///* pwrgood */ Ok Idem
-//				MX7D_PAD_ENET1_CRS__EPDC_PWR_CTRL0		0x80000000 //MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x80000000  /* v3p3 */
+				MX7D_PAD_ENET1_RX_CLK__GPIO7_IO13		0x80000000 //MX7D_PAD_ENET1_RX_CLK__EPDC_PWR_WAKE MX7D_PAD_EPDC_SDCE3__GPIO2_IO23		0x80000000  /* wakeup */
+				MX7D_PAD_ENET1_RGMII_RD0__GPIO7_IO0		0x80000000 //MX7D_PAD_ENET1_RGMII_RD0__EPDC_VCOM0  MX7D_PAD_I2C4_SCL__GPIO4_IO14		0x80000000  /* vcom_ctrl */ MX7D_PAD_ENET1_RGMII_RD0__GPIO7_IO0
+				MX7D_PAD_ENET1_TX_CLK__GPIO7_IO12		0x80000000 //MX7D_PAD_ENET1_TX_CLK__EPDC_PWR_IRQ // MX7D_PAD_EPDC_SDCE2__GPIO2_IO22		0x80000000  /* pwr int */
+				MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31		0x80000000  ///* pwrgood */ Ok Idem
+				MX7D_PAD_ENET1_CRS__GPIO7_IO14		0x80000000 //MX7D_PAD_ENET1_CRS__EPDC_PWR_CTRL0		//MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x80000000  /* v3p3 */
 			>;
 		};
 
