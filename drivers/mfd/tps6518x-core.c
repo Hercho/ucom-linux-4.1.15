@@ -224,7 +224,8 @@ static int tps6518x_detect(struct i2c_client *client,
 	 * Known rev-ids
 	 * tps165180 pass 1 = 0x50, tps65180 pass2 = 0x60, tps65181 pass1 = 0x51, tps65181 pass2 = 0x61, 
 	 * tps65182, 
-	 * tps65185 pass0 = 0x45, tps65186 pass0 0x46, tps65185 pass1 = 0x55, tps65186 pass1 0x56, tps65185 pass2 = 0x65, tps65186 pass2 0x66
+	 * tps65185 pass0 = 0x45, tps65186 pass0 0x46, tps65185 pass1 = 0x55, tps65186 pass1 0x56, tps65185 pass2 = 0x65, 		tps65186 pass2 0x66 
+	add new ref. TPS65185_PASS3 0xFB BpmShell V2 hardware
 	 */
 	if (!((revId == TPS65180_PASS1) ||
 		 (revId == TPS65181_PASS1) ||
@@ -235,6 +236,7 @@ static int tps6518x_detect(struct i2c_client *client,
 		 (revId == TPS65185_PASS1) ||
 		 (revId == TPS65186_PASS1) ||
 		 (revId == TPS65185_PASS2) ||
+		 (revId == TPS65185_PASS3) ||
 		 (revId == TPS65186_PASS2)))
 	{
 		dev_info(&adapter->dev,

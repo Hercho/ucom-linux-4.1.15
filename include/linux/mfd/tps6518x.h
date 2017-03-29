@@ -40,7 +40,7 @@
 #define TPS65186_PASS1 0x56
 #define TPS65185_PASS2 0x65
 #define TPS65186_PASS2 0x66
-
+#define TPS65185_PASS3 0xFB  // add new ref ID to support BomShell V2 Hardware
 /*
  * PMIC Register Addresses
  */
