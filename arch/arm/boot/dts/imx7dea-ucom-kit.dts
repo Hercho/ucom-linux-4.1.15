@@ -499,14 +499,27 @@
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
 
-	/* elan-touch ektf2232 */ //Falta habilitar pines de control en iomux... 
-	elan@10 {  //15	
+	/* elan-touch ektf2232 */  
+/*	elan@15 { 
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_epdc_elan_touch>;
-		compatible = "elan,elan-touch";//compatible = "elan,elan-ktf2k";
-		reg = <0x10>; //reg = <0x15>;
-		interrupt-parent = <&gpio7>;  // 2 
+		compatible = compatible = "elan,elan-ktf2k";
+		reg = <0x15>; 
+		interrupt-parent = <&gpio7>;  
 		interrupts = <7 7>;	//<10 2>;
+		gpio_elan_cs = <&gpio1 2 0>;	//<&gpio2 9 0>;  //GPIO1_IO02 -> CE   <&gpio1 2 0>;
+		gpio_elan_rst = <&gpio1 3 0>; 	//<&gpio4 4 0>; //GPIO1_IO03 -> RESET <&gpio1 3 0>; 
+		gpio_intr = <&gpio7 7 0>;	  //ENET1_TD1  -> (INTERRUP MX7D_PAD_ENET1_RGMII_TD1__GPIO7_IO7)
+		status = "okay"; //ENABLE_TOUCH -> GPIO1_IO04 (mosfet) (jumper permanente)
+	};
+	/* elan-touch */
+	elan@10 {  
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_epdc_elan_touch>;
+		compatible = "elan,elan-touch";
+		reg = <0x10>; 
+		interrupt-parent = <&gpio7>; 
+		interrupts = <7 7>;	
 		gpio_elan_cs = <&gpio1 2 0>;	//<&gpio2 9 0>;  //GPIO1_IO02 -> CE   <&gpio1 2 0>;
 		gpio_elan_rst = <&gpio1 3 0>; 	//<&gpio4 4 0>; //GPIO1_IO03 -> RESET <&gpio1 3 0>; 
 		gpio_intr = <&gpio7 7 0>;	  //ENET1_TD1  -> (INTERRUP MX7D_PAD_ENET1_RGMII_TD1__GPIO7_IO7)
@@ -528,7 +541,6 @@
 		compatible = "ti,tps6518x";
 		reg = <0x68>;
 		status = "okay";
-
 		/*
 		* power sequencing for TPS65180/65181
 		*/		 

@@ -170,7 +170,7 @@ static int tps6518x_probe(struct i2c_client *client,
 	}
 	tps6518x->pdata = pdata;
 
-	dev_info(&client->dev, "PMIC TPS6518x for eInk display\n");
+	dev_info(&client->dev, "PMIC TPS6518x for eInk display - BomShell V2 - Development by INTI \n");
 
 	printk("tps6518x_probe success\n");
 
