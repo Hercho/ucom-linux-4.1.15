@@ -1459,7 +1459,7 @@ static struct i2c_driver ektf2k_ts_driver = {
 
 static int __init elan_ktf2k_ts_init(void)
 {
-	printk(KERN_INFO "[elan] %s driver version 0x0005: Integrated 2, 5, and 10 fingers together and auto-mapping resolution\n", __func__);
+	printk(KERN_INFO "[elan] %s driver version 0x0005: Integrated 1, 2, 5, and 10 fingers together and auto-mapping resolution - Developmente By INTI\n", __func__);
 	return i2c_add_driver(&ektf2k_ts_driver);
 }
 

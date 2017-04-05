@@ -112,6 +112,7 @@ static ssize_t show_temp_input(struct device *dev,
 	   case TPS65185_PASS1 :
 	   case TPS65186_PASS1 :
 	   case TPS65185_PASS2 :
+	   case	TPS65185_PASS3 :	 
 	   case TPS65186_PASS2 :
 		    reg_val = 0x80;
 		    tps6518x_reg_write(REG_TPS65185_TMST1, reg_val);
@@ -155,6 +156,7 @@ static ssize_t show_intr_regs(struct device *dev,
 	   case TPS65185_PASS1 :
 	   case TPS65186_PASS1 :
 	   case TPS65185_PASS2 :
+	   case	TPS65185_PASS3 :
 	   case TPS65186_PASS2 :
 		    tps6518x_reg_read(REG_TPS65185_INT1, &intr_reg_val);
 		    tps6518x_reg_read(REG_TPS65185_INT2, &reg_val);
@@ -190,6 +192,7 @@ static ssize_t show_vcom(struct device *dev,
 	   case TPS65185_PASS1 :
 	   case TPS65186_PASS1 :
 	   case TPS65185_PASS2 :
+	   case	TPS65185_PASS3 :
 	   case TPS65186_PASS2 :
 		    tps6518x_reg_read(REG_TPS65185_VCOM1, &vcom_reg_val);
 		    tps6518x_reg_read(REG_TPS65185_VCOM2, &reg_val);
@@ -225,6 +228,7 @@ static ssize_t set_vcom(struct device *dev,
 	   case TPS65185_PASS1 :
 	   case TPS65186_PASS1 :
 	   case TPS65185_PASS2 :
+	   case	TPS65185_PASS3 :
 	   case TPS65186_PASS2 :
 		    tps6518x_reg_write(REG_TPS65185_VCOM1, vcom_reg_val&0xff);
 		    tps6518x_reg_write(REG_TPS65185_VCOM2, (vcom_reg_val>>8)&0xff);
