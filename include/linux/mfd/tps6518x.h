@@ -36,11 +36,11 @@
 #define TPS65181_PASS2 0x61
 #define TPS65185_PASS0 0x45
 #define TPS65186_PASS0 0x46
-#define TPS65185_PASS1 0x55
+#define TPS65185_PASS1 0xFB		/* Bombshell V2 HW */ 
 #define TPS65186_PASS1 0x56
 #define TPS65185_PASS2 0x65
 #define TPS65186_PASS2 0x66
-#define TPS65185_PASS3 0xFB  // add new ref ID to support BomShell V2 Hardware
+
 /*
  * PMIC Register Addresses
  */
@@ -122,17 +122,17 @@ enum {
 /* VCOM_ADJUST */
 #define VCOM_SET_LSH    0
 #define VCOM_SET_WID    8
-#define VCOM1_SET_LSH    0
-#define VCOM1_SET_WID    8
-#define VCOM2_SET_LSH    0
-#define VCOM2_SET_WID    1
-#define VCOM_ACQ_LSH	15
+#define VCOM1_SET_LSH   0
+#define VCOM1_SET_WID   8
+#define VCOM2_SET_LSH   0
+#define VCOM2_SET_WID   1 //8
+#define VCOM_ACQ_LSH	15 //7
 #define VCOM_ACQ_WID	1
-#define VCOM_PROG_LSH	14
+#define VCOM_PROG_LSH	14 //6
 #define VCOM_PEOG_WID	1
-#define VCOM_HiZ_LSH	13
+#define VCOM_HiZ_LSH	13 //5
 #define VCOM_HiZ_WID	1
-#define VCOM_AVG_LSH	11
+#define VCOM_AVG_LSH	11 //3
 #define VCOM_AVG_WID	2
 /* INT_ENABLE1 */
 #define TSD_EN_LSH        6

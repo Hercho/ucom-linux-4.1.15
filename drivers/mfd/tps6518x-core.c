@@ -68,11 +68,12 @@ int tps6518x_reg_read(int reg_num, unsigned int *reg_val)
 
 	result = i2c_smbus_read_byte_data(tps6518x_client, reg_num);
 	if (result < 0) {
-		dev_err(&tps6518x_client->dev,
-			"Unable to read tps6518x register via I2C\n");
+//		dev_err(&tps6518x_client->dev,
+//			"Unable to read tps6518x register via I2C\n");
+//		printk("tps6518x_  Error read, Address=%u  registro=%u\n",&tps6518x_client->addr,reg_num);
 		return PMIC_ERROR;
 	}
-
+	
 	*reg_val = result;
 	return PMIC_SUCCESS;
 }
@@ -87,10 +88,13 @@ int tps6518x_reg_write(int reg_num, const unsigned int reg_val)
 	result = i2c_smbus_write_byte_data(tps6518x_client, reg_num, reg_val);
 	if (result < 0) {
 		dev_err(&tps6518x_client->dev,
-			"tps6518x-core.c line-90:14, Unable to write TPS6518x register via I2C\n");
+			"Unable to write TPS6518x register via I2C\n");
+//		printk("tps6518x_ ERROR Write - tps6518x_reg_write in tps6518x-core, Address= %u  reg= %u valor= %u\n",
+//		&tps6518x_client->addr,reg_num, reg_val);
 		return PMIC_ERROR;
 	}
-
+//	printk("tps6518x_ OK Write - tps6518x_reg_write in tps6518x-core, Address= %u  reg= %u valor= %u\n",
+//		&tps6518x_client->addr,reg_num, reg_val);
 	return PMIC_SUCCESS;
 }
 
@@ -169,12 +173,11 @@ static int tps6518x_probe(struct i2c_client *client,
 
 	}
 	tps6518x->pdata = pdata;
-
-	dev_info(&client->dev, "PMIC TPS6518x for eInk display - BomShell V2 - Development by INTI \n");
+	/* Set Power Good Polarity for BombShellv2 HW */
+	tps6518x->pwrgood_polarity=1;
+	dev_info(&client->dev, "PMIC TPS6518x for eInk display\n");
 
 	printk("tps6518x_probe success\n");
-	gpio_set_value(tps6518x->gpio_pmic_wakeup,1);
-	gpio_set_value(tps6518x->gpio_pmic_powerup,0);
 
 	return ret;
 
@@ -226,8 +229,7 @@ static int tps6518x_detect(struct i2c_client *client,
 	 * Known rev-ids
 	 * tps165180 pass 1 = 0x50, tps65180 pass2 = 0x60, tps65181 pass1 = 0x51, tps65181 pass2 = 0x61, 
 	 * tps65182, 
-	 * tps65185 pass0 = 0x45, tps65186 pass0 0x46, tps65185 pass1 = 0x55, tps65186 pass1 0x56, tps65185 pass2 = 0x65, 		tps65186 pass2 0x66 
-	add new ref. TPS65185_PASS3 0xFB BomShell V2 hardware
+	 * tps65185 pass0 = 0x45, tps65186 pass0 0x46, tps65185 pass1 = 0x55, tps65186 pass1 0x56, tps65185 pass2 = 0x65, tps65186 pass2 0x66, add revID= 0xFB BombShell v2 HW
 	 */
 	if (!((revId == TPS65180_PASS1) ||
 		 (revId == TPS65181_PASS1) ||
@@ -238,7 +240,6 @@ static int tps6518x_detect(struct i2c_client *client,
 		 (revId == TPS65185_PASS1) ||
 		 (revId == TPS65186_PASS1) ||
 		 (revId == TPS65185_PASS2) ||
-		 (revId == TPS65185_PASS3) || // add BombShellv2
 		 (revId == TPS65186_PASS2)))
 	{
 		dev_info(&adapter->dev,
@@ -249,7 +250,7 @@ static int tps6518x_detect(struct i2c_client *client,
 	if (info) {
 		strlcpy(info->type, "tps6518x_sensor", I2C_NAME_SIZE);
 	}
-    printk("tps6518x_detect success\n");
+    printk("tps6518x_ Detect success! revId==0x%02X \n", revId);
 
 	return 0;
 }
@@ -300,5 +301,4 @@ static void __exit tps6518x_exit(void)
  * Module entry points
  */
 subsys_initcall(tps6518x_init);
-//module_init(tps6518x_init);
 module_exit(tps6518x_exit);

@@ -124,16 +124,18 @@ static int epdc_pwr0_disable(struct regulator_dev *reg)
 static int tps6518x_v3p3_enable(struct regulator_dev *reg)
 {
 	struct tps6518x *tps6518x = rdev_get_drvdata(reg);
-
+	printk ("tps6518x_ Regulator V3P3 Enable - powerUp 1 line127\n\n");
 	gpio_set_value(tps6518x->gpio_pmic_powerup, 1);
+	//gpio_set_value(tps6518x->gpio_pmic_wakeup, 1); //add
 	return 0;
 }
 
 static int tps6518x_v3p3_disable(struct regulator_dev *reg)
 {
 	struct tps6518x *tps6518x = rdev_get_drvdata(reg);
-
+	printk ("tps6518x_ Regulator V3P3 Disable - powerUp 0 line136\n\n");
 	gpio_set_value(tps6518x->gpio_pmic_powerup, 0);
+	////gpio_set_value(tps6518x->gpio_pmic_wakeup, 0); //add
 	return 0;
 
 }
@@ -166,10 +168,22 @@ static int tps6518x_vcom_set_voltage(struct regulator_dev *reg,
 	if (uV < 200000)
 		return 0;
 #endif
-
+	printk("tps6518x_ Funcion VCOM_set_voltage ID=%u \n",tps6518x->revID);	
 	switch (tps6518x->revID & 15)
 	{
-		case 0 : /* TPS65180 */
+		case 0 : /* TPS65185 - BombSHELL */	
+			gpio_set_value(tps6518x->gpio_pmic_wakeup,1);
+			retval = tps6518x_reg_write(REG_TPS65185_VCOM1,
+					vcom2_uV_to_rs(uV) & 255);
+			tps6518x_reg_read( REG_TPS65185_VCOM2,&cur_reg_val);
+			new_reg_val = to_reg_val(cur_reg_val,
+					BITFMASK(VCOM2_SET),
+					BITFVAL(VCOM2_SET, vcom2_uV_to_rs(uV)/256));
+
+			retval = tps6518x_reg_write(REG_TPS65185_VCOM2,
+					new_reg_val);
+			printk("tps6518x_ VCOM_set_voltage CASE:0  value=%d\n",retval);
+			break;
 		case 1 : /* TPS65181 */
 		case 4 : /* TPS65180-rev1 */
 			tps6518x_reg_read(REG_TPS65180_VCOM_ADJUST,&cur_reg_val);
@@ -181,19 +195,8 @@ static int tps6518x_vcom_set_voltage(struct regulator_dev *reg,
 					new_reg_val);
 			break;
 		case 5 : /* TPS65185 */
-			gpio_set_value(tps6518x->gpio_pmic_wakeup,1);
-			retval = tps6518x_reg_write(REG_TPS65185_VCOM1,
-					vcom2_uV_to_rs(uV) & 255);
-			tps6518x_reg_read( REG_TPS65185_VCOM2,&cur_reg_val);
-			new_reg_val = to_reg_val(cur_reg_val,
-					BITFMASK(VCOM2_SET),
-					BITFVAL(VCOM2_SET, vcom2_uV_to_rs(uV)/256));
-
-			retval = tps6518x_reg_write(REG_TPS65185_VCOM2,
-					new_reg_val);
-
-			break;
 		case 6 : /* TPS65186 */
+			printk("tps6518x_ VCOM_set_voltage CASE:6 \n");	
 			gpio_set_value(tps6518x->gpio_pmic_wakeup,1);
 			retval = tps6518x_reg_write(REG_TPS65185_VCOM1,
 					vcom2_uV_to_rs(uV) & 255);
@@ -204,7 +207,7 @@ static int tps6518x_vcom_set_voltage(struct regulator_dev *reg,
 
 			retval = tps6518x_reg_write(REG_TPS65185_VCOM2,
 					new_reg_val);
-
+			printk("tps6518x_ VCOM_set_voltage CASE:6  value=%d\n",retval);
 			break;
 		default :
 		retval = -1;
@@ -225,10 +228,16 @@ static int tps6518x_vcom_get_voltage(struct regulator_dev *reg)
 	 */
 	if (tps6518x->revID == 65182)
 		return 0;
-	
+	printk("tps6518x_ VCOM_get_voltage Function ID=%u \n",tps6518x->revID);	
 	switch (tps6518x->revID & 15)
 	{
-		case 0 : /* TPS65180 */
+		case 0 : /* TPS65185 - bOMBsHELL */	
+			tps6518x_reg_read(REG_TPS65185_VCOM1,&cur_reg_val);
+			tps6518x_reg_read(REG_TPS65185_VCOM2,&cur_reg2_val);
+			cur_reg_val |= 256 * (1 & cur_reg2_val);
+			vcomValue = vcom2_rs_to_uV(cur_reg_val);
+			printk("tps6518x_ VCOM_Get_voltage CASE:0 value= %d \n",vcomValue);
+			break;
 		case 1 : /* TPS65181 */
 		case 4 : /* TPS65180-rev1 */
 			tps6518x_reg_read(REG_TPS65180_VCOM_ADJUST, &cur_reg_val);
@@ -236,13 +245,8 @@ static int tps6518x_vcom_get_voltage(struct regulator_dev *reg)
 			vcomValue = vcom_rs_to_uV(cur_fld_val);
 			break;
 		case 5 : /* TPS65185 */
-						tps6518x_reg_read(REG_TPS65185_VCOM1,&cur_reg_val);
-			tps6518x_reg_read(REG_TPS65185_VCOM2,&cur_reg2_val);
-			cur_reg_val |= 256 * (1 & cur_reg2_val);
-			vcomValue = vcom2_rs_to_uV(cur_reg_val);
-			break;
-//
 		case 6 : /* TPS65186 */
+			printk("tps6518x_ VCOM_Get_voltage CASE:6 \n");	
 			tps6518x_reg_read(REG_TPS65185_VCOM1,&cur_reg_val);
 			tps6518x_reg_read(REG_TPS65185_VCOM2,&cur_reg2_val);
 			cur_reg_val |= 256 * (1 & cur_reg2_val);
@@ -261,6 +265,7 @@ static int tps6518x_vcom_enable(struct regulator_dev *reg)
 	struct tps6518x *tps6518x = rdev_get_drvdata(reg);
 	unsigned int cur_reg_val; /* current register value */
 	int vcomEnable = 0;
+	int fault;
 	/*
 	 * check for the TPS65182 device
 	 */
@@ -269,48 +274,61 @@ static int tps6518x_vcom_enable(struct regulator_dev *reg)
 		gpio_set_value(tps6518x->gpio_pmic_vcom_ctrl,vcomEnable);
 		return 0;
 	}
-
+	printk("tps6518x_ Entro en VCOM_enable() RevID:  %u\n",tps6518x->revID);
 	/*
 	 * Check to see if we need to set the VCOM voltage.
 	 * Should only be done one time. And, we can
 	 * only change vcom voltage if we have been enabled.
 	 */
-	if (!tps6518x->vcom_setup && tps6518x_is_power_good(tps6518x)) {
+	if (!tps6518x->vcom_setup && tps6518x_is_power_good(tps6518x)) { //tira vcom_SEtup=0 y tps_PWR-GOOD=1, OK!
+		printk("tps6518x_ Entro en IF VCOM_enable() vcom_SEtup=%u y tps_PWR-GOOD=%u\n",tps6518x->vcom_setup,tps6518x_is_power_good(tps6518x));		
 		tps6518x_vcom_set_voltage(reg,
 			tps6518x->vcom_uV,
 			tps6518x->vcom_uV,
 			NULL);
 		tps6518x->vcom_setup = true;
 	}
-
+		
 	switch (tps6518x->revID & 15)
 	{
-		case 0 : /* TPS65180 */
+		case 0 : /* TPS65180 - BombShell*/
+			tps6518x_reg_read(REG_TPS65185_VCOM2,&cur_reg_val);
+			printk("tps6518x_ VCOM2 current value = %u \n",cur_reg_val);			
+			// do not enable vcom if HiZ bit is set
+			if (cur_reg_val & (1<<VCOM_HiZ_LSH))
+			{
+				printk("tps6518x_ Do not enable VCOM_enable CASE:0 \n");			
+				vcomEnable = 0;
+			}else{
+				vcomEnable = 1;
+				printk("tps6518x_ Enable VCOM_enable  CASE:0 value=%d \n",vcomEnable);				
+				}			
+			break;
 		case 1 : /* TPS65181 */
 		case 4 : /* TPS65180-rev1 */
 			vcomEnable = 1;
 			break;
 		case 5 : /* TPS65185 */
-			tps6518x_reg_read(REG_TPS65185_VCOM2,&cur_reg_val);
-			// do not enable vcom if HiZ bit is set
-			if (cur_reg_val & (1<<VCOM_HiZ_LSH))
-				vcomEnable = 0;
-			else
-				vcomEnable = 1;
-			break;
-
 		case 6 : /* TPS65186 */
 			tps6518x_reg_read(REG_TPS65185_VCOM2,&cur_reg_val);
 			// do not enable vcom if HiZ bit is set
 			if (cur_reg_val & (1<<VCOM_HiZ_LSH))
+			{
+				printk("tps6518x_ Do not enable VCOM CASE:6 \n");			
 				vcomEnable = 0;
-			else
+			}else{
 				vcomEnable = 1;
+				printk("tps6518x_ Enable VCOM  CASE:6\n");				
+				}			
 			break;
 		default:
 			vcomEnable = 0;
 	}
 	gpio_set_value(tps6518x->gpio_pmic_vcom_ctrl,vcomEnable);
+
+	tps6518x_reg_read(REG_TPS65185_INT2,&fault);
+	if(fault!=0)
+		printk("tps6518x_ Error vcom_enable(); Reg.0x08 (INT2), value= %d \n",fault);	
 
 	return 0;
 }
@@ -318,7 +336,8 @@ static int tps6518x_vcom_enable(struct regulator_dev *reg)
 static int tps6518x_vcom_disable(struct regulator_dev *reg)
 {
 	struct tps6518x *tps6518x = rdev_get_drvdata(reg);
-
+	
+	printk("tps6518x_ Disable VCOM \n");
 	gpio_set_value(tps6518x->gpio_pmic_vcom_ctrl,0);
 	return 0;
 }
@@ -334,15 +353,19 @@ static int tps6518x_vcom_is_enabled(struct regulator_dev *reg)
 		return 1;
 }
 
-
 static int tps6518x_is_power_good(struct tps6518x *tps6518x)
 {
 	/*
 	 * XOR of polarity (starting value) and current
 	 * value yields whether power is good.
 	 */
+	
+	printk("tps6518x_ Check pmic_pwrgood GPIO ori_polarity=%d, pmic_pwrgood=%d Return=%d \n",
+		tps6518x->pwrgood_polarity,tps6518x->gpio_pmic_pwrgood,(gpio_get_value(tps6518x->gpio_pmic_pwrgood) ^
+		tps6518x->pwrgood_polarity));
+
 	return gpio_get_value(tps6518x->gpio_pmic_pwrgood) ^
-		tps6518x->pwrgood_polarity;
+		tps6518x->pwrgood_polarity; //set 1 Xor 1-1=0 fails y 0-1=1 in regulation mode
 }
 
 static int tps6518x_wait_power_good(struct tps6518x *tps6518x)
@@ -351,7 +374,7 @@ static int tps6518x_wait_power_good(struct tps6518x *tps6518x)
 	for (i = 0; i < tps6518x->max_wait * 3; i++) {
 		if (tps6518x_is_power_good(tps6518x))
 			return 0;
-
+		
 		msleep(1);
 	}
 	return -ETIMEDOUT;
@@ -364,33 +387,55 @@ static int tps6518x_display_enable(struct regulator_dev *reg)
 	unsigned int fld_mask;	  /* register mask for bitfield to modify */
 	unsigned int fld_val;	  /* new bitfield value to write */
 	unsigned int new_reg_val; /* new register value to write */
+	int fault; 	/*fault INT1 INT2 */
+	
 	if (tps6518x->revID == 65182)
 	{
 		epdc_pwr0_enable(reg);
+//		printk("tps6518x_ iF Display_enable... \n");	
 	}
 	else
 	{
-		gpio_set_value(tps6518x->gpio_pmic_wakeup,1);
-		//gpio_set_value(tps6518x->gpio_pmic_powerup,0);
+//		printk("tps6518x_ ELSE display_enable.... \n");
+		gpio_set_value(tps6518x->gpio_pmic_wakeup,1); //ver secuencia powerUp, wakUp (orden encendido)
+		msleep(1);
 
 		/* enable display regulators */
 		cur_reg_val = tps65180_current_Enable_Register & 0x3f;
-		fld_mask = BITFMASK(VDDH_EN) | BITFMASK(VPOS_EN) |
-			BITFMASK(VEE_EN) | BITFMASK(VNEG_EN);
-		fld_val = BITFVAL(VDDH_EN, true) | BITFVAL(VPOS_EN, true) |
-			BITFVAL(VEE_EN, true) | BITFVAL(VNEG_EN, true) | BITFVAL(VCOM_EN, true);
+		fld_mask = BITFMASK(VCOM_EN) | BITFMASK(VDDH_EN) |     
+			BITFMASK(VPOS_EN) | BITFMASK(VEE_EN) | BITFMASK(VNEG_EN); 	// add VCOM_EN,V3P3_EN mask
+		fld_val =  BITFVAL(VCOM_EN, true) | 	
+			BITFVAL(VDDH_EN, true) | BITFVAL(VPOS_EN, true) | BITFVAL(VEE_EN, true) | BITFVAL(VNEG_EN, true);	
 		new_reg_val = tps65180_current_Enable_Register = to_reg_val(cur_reg_val, fld_mask, fld_val);
-		tps6518x_reg_write(REG_TPS65180_ENABLE, new_reg_val);
+		tps6518x_reg_write(REG_TPS65185_ENABLE, new_reg_val); 	// baja 00111111
+		
+		msleep(1);
+//		printk("tps6518x_ primer write registro reg=%u - valor=%u \n\n",REG_TPS65185_ENABLE,new_reg_val,new_reg_val);
+
+	/*TODO - 	
+	The integrated power switch is used to cut the 3.3-V supply to the EPD panel and is controlled through the
+	V3P3_EN pin of the ENABLE register. In SLEEP mode the switch is automatically turned off and its output is
+	discharged to ground. The default power-up state is OFF. To turn the switch ON, set the V3P3_ENbit to 1.*/
 
 		/* turn on display regulators */
 		cur_reg_val = tps65180_current_Enable_Register & 0x3f;
-		fld_mask = BITFMASK(ACTIVE);
-		fld_val = BITFVAL(ACTIVE, true);
-		new_reg_val = tps65180_current_Enable_Register = to_reg_val(cur_reg_val, fld_mask, fld_val);
-		tps6518x_reg_write(REG_TPS65180_ENABLE, new_reg_val);
+		fld_mask = BITFMASK(ACTIVE); 	
+		fld_val = BITFVAL(ACTIVE, true); 
+		new_reg_val = tps65180_current_Enable_Register = to_reg_val(cur_reg_val, fld_mask, fld_val); 
+		tps6518x_reg_write(REG_TPS65185_ENABLE, new_reg_val); 	// set AcTIVE to "1"- baja 10011111
 		
-		//gpio_set_value(tps6518x->gpio_pmic_powerup,1);
+//		printk("tps6518x_ segundo write registro reg=%u valor=%u \n\n",REG_TPS65185_ENABLE,new_reg_val);
+		//tps6518x_reg_write(1,191); //reg 0x01, val 0xbf - 10111111
+		//gpio_set_value(tps6518x->gpio_pmic_powerup,1); //add
 	}
+
+	msleep(1);
+	tps6518x_reg_read(REG_TPS65185_INT1,&fault);
+	if (fault!=0)
+		printk("tps6518x_ Error Reg.0x07 (INT1), value= %d \n",fault);
+	tps6518x_reg_read(REG_TPS65185_INT2,&fault);
+	if(fault!=0)
+		printk("tps6518x_ Error Reg.0x08 (INT2), value= %d \n",fault);	
 
 	return tps6518x_wait_power_good(tps6518x);
 }
@@ -415,7 +460,8 @@ static int tps6518x_display_disable(struct regulator_dev *reg)
 		fld_val = BITFVAL(VCOM_EN, true) | BITFVAL(STANDBY, true);
 		new_reg_val = tps65180_current_Enable_Register = to_reg_val(cur_reg_val, fld_mask, fld_val);
 		tps6518x_reg_write(REG_TPS65180_ENABLE, new_reg_val);
-
+		//gpio_set_value(tps6518x->gpio_pmic_powerup,0);	//add
+//		printk("tps6518x_ disable, EPDC DIsplay dir=%u val= %u  line443\n",REG_TPS65180_ENABLE, new_reg_val);
 	}
 
 	msleep(tps6518x->max_wait);
@@ -502,15 +548,16 @@ static void tps6518x_setup_timings(struct tps6518x *tps6518x)
 		tps6518x_reg_write(REG_TPS65180_PWRSEQ0, tps6518x->pwr_seq0);
 		tps6518x_reg_write(REG_TPS65180_PWRSEQ1, tps6518x->pwr_seq1);
 		tps6518x_reg_write(REG_TPS65180_PWRSEQ2, tps6518x->pwr_seq2);
-	    }
+		printk("tps6518x_ tps65180 - setup timmings= %d, %d, %d, \n",tps6518x->pwr_seq0,
+tps6518x->pwr_seq1,tps6518x->pwr_seq2);	    
+		}
 	}
-   	
+
 	if ((tps6518x->revID == TPS65185_PASS0) ||
 		 (tps6518x->revID == TPS65186_PASS0) ||
 		 (tps6518x->revID == TPS65185_PASS1) ||
 		 (tps6518x->revID == TPS65186_PASS1) ||
 		 (tps6518x->revID == TPS65185_PASS2) ||
-		 (tps6518x->revID == TPS65185_PASS3) || /* Add Support for 0xFB revID tps65185 - BombShell v2 hardware */
 		 (tps6518x->revID == TPS65186_PASS2)) {
 	   tps6518x_reg_read(REG_TPS65185_UPSEQ0, &temp0);
 	   tps6518x_reg_read(REG_TPS65185_UPSEQ1, &temp1);
@@ -524,7 +571,9 @@ static void tps6518x_setup_timings(struct tps6518x *tps6518x)
 		tps6518x_reg_write(REG_TPS65185_UPSEQ1, tps6518x->upseq1);
 		tps6518x_reg_write(REG_TPS65185_DWNSEQ0, tps6518x->dwnseq0);
 		tps6518x_reg_write(REG_TPS65185_DWNSEQ1, tps6518x->dwnseq1);
-	    }
+		printk("tps6518x_ tps65185 - setup timmings= %d, %d, %d, %d, \n",tps6518x->upseq0,tps6518x->upseq1,
+tps6518x->dwnseq0,tps6518x->dwnseq1);	    
+		}
 	}
 }
 
@@ -583,12 +632,10 @@ static int tps6518x_pmic_dt_parse_pdata(struct platform_device *pdev,
 		}
 
 		rdata->id = i;
-		//controlar parametros funcion of_get_regulator_init_data() modificados
-		rdata->initdata = of_get_regulator_init_data(&pdev->dev,reg_np, tps6518x_reg); //(&pdev->dev,pmic_np, tps6518x_reg);
-													//(reg_np,pmic_np,tps6518x_reg )
-		/*includeed in /linux/regulator/of_regulator.h
-of_get_regulator_init_data(struct device *dev, struct device_node *node, const struct regulator_desc *desc);
-		*/
+		//rdata->initdata = of_get_regulator_init_data(&pdev->dev,
+			//				     reg_np);
+		rdata->initdata = of_get_regulator_init_data(&pdev->dev,reg_np, tps6518x_reg); /* BombShell V2 */
+		
 		rdata->reg_node = reg_np;
 		rdata++;
 	}
@@ -724,12 +771,9 @@ static int tps6518x_regulator_probe(struct platform_device *pdev)
 	 * changed a limited number of times according to spec.
 	 */
 	tps6518x_setup_timings(tps6518x);
-	//add gpio active I2C in Stanby Mode....
-	//gpio_set_value(tps6518x->gpio_pmic_wakeup,1);
-	//gpio_set_value(tps6518x->gpio_pmic_powerup,0);   
-	printk("tps6518x_regulator_probe success\n");
-	return 0;
 
+    printk("tps6518x_regulator_probe success\n");
+	return 0;
 err:
 	while (--i >= 0)
 		regulator_unregister(rdev[i]);
@@ -741,9 +785,9 @@ static int tps6518x_regulator_remove(struct platform_device *pdev)
 	struct tps6518x_data *priv = platform_get_drvdata(pdev);
 	struct regulator_dev **rdev = priv->rdev;
 	int i;
-
+	printk ("tps6518x_ Unregistred regulador \n");
 	for (i = 0; i < priv->num_regulators; i++)
-		regulator_unregister(rdev[i]);
+		regulator_unregister(rdev[i]);   //
 	return 0;
 }
 
@@ -758,17 +802,15 @@ static struct platform_driver tps6518x_regulator_driver = {
 	.remove = tps6518x_regulator_remove,
 	.id_table = tps6518x_pmic_id,
 	.driver = {
-	.name = "tps6518x-pmic",
+		.name = "tps6518x-pmic",
 	},
 };
 
 static int __init tps6518x_regulator_init(void)
 {
-	printk("PMIC tps65185 regulator init, Development By INTI \n");
 	return platform_driver_register(&tps6518x_regulator_driver);
 }
 subsys_initcall_sync(tps6518x_regulator_init);
-
 
 static void __exit tps6518x_regulator_exit(void)
 {
@@ -780,20 +822,21 @@ module_exit(tps6518x_regulator_exit);
 /*
  * Parse user specified options (`tps6518x:')
  * example:
- *   tps6518x:pass=2,vcom=-1250000
+ *   tps6518x:pass=2,vcom=-1250000 (uV) -1.25V
  */
 static int __init tps6518x_setup(char *options)
 {
 	int ret;
 	char *opt;
 	unsigned long ulResult;
+	printk("tps6518x_ _init tps65185 Options= %s \n",options);//tps6518x_ _init tps65185 Options= pass=5,vcom=-1250000 	
 	while ((opt = strsep(&options, ",")) != NULL) {
 		if (!*opt)
 			continue;
 		if (!strncmp(opt, "pass=", 5)) {
-			//ret = strict_strtoul((const char *)(opt + 5), 0, &ulResult);
-			ret = kstrtoul((const char *)(opt + 5), 0, &ulResult);			// update to kernel > 4.1.15
+			ret = kstrtoul((const char *)(opt + 5), 0, &ulResult);
 			tps6518x_pass_num = ulResult;
+			printk("tps6518x_ tps6518x_pass_num=%u \n",tps6518x_pass_num);//tps6518x_ tps6518x_pass_num=5 
 			if (ret < 0)
 				return ret;
 		}
@@ -801,12 +844,12 @@ static int __init tps6518x_setup(char *options)
 			int offs = 5;
 			if (opt[5] == '-')
 				offs = 6;
-			//ret = strict_strtoul((const char *)(opt + offs), 0, &ulResult);
 			ret = kstrtoul((const char *)(opt + offs), 0, &ulResult);
 			tps6518x_vcom = (int) ulResult;
 			if (ret < 0)
 				return ret;
 			tps6518x_vcom = -tps6518x_vcom;
+			printk("tps6518x_ tps6518x_vcom= %u \n",tps6518x_vcom);//tps6518x_ tps6518x_vcom= 4293717296
 		}
 	}
 
@@ -820,6 +863,7 @@ static int __init tps65182_setup(char *options)
 	int ret;
 	char *opt;
 	unsigned long ulResult;
+	printk("tps6518x_ _init tps65182 Options= %s ",options); 
 	while ((opt = strsep(&options, ",")) != NULL) {
 		if (!*opt)
 			continue;
@@ -846,9 +890,6 @@ static int __init tps65182_setup(char *options)
 
 __setup("tps65182:", tps65182_setup);
 
-
-//module_init(tps6518x_regulator_init);
-//module_exit(tps6518x_regulator_exit);
 
 /* Module information */
 MODULE_DESCRIPTION("TPS6518x regulator driver");
